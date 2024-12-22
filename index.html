@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aquilaresbot API</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Animate.css -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <style>
+        /* CSS to ensure columns are consistently aligned */
+        .table th, .table td {
+            text-align: center;
+            vertical-align: middle;
+        }
+        .table th {
+            width: 33%; /* Ensure columns have equal width */
+        }
+    </style>
+</head>
+<body class="bg-light text-dark">
+  
+  <audio id="audioPlayer" autoplay>
+    <source id="audioSource" type="audio/mpeg">
+    Your browser does not support the audio element.
+</audio>
+
+    <div class="container py-4">
+        <!-- Header -->
+        <div class="d-flex justify-content-between align-items-center mb-4 animate__animated animate__fadeInDown">
+            <h1 class="fw-bold mb-0">Aquilaresbot API</h1>
+            <button id="toggleMode" class="btn btn-outline-secondary">
+                <span id="toggleIcon">
+                    <i class="fas fa-sun"></i> Mode
+                </span>
+            </button>
+        </div>
+
+        <!-- Central Info Card -->
+        <div class="card bg-body-tertiary text-center mb-4 animate__animated animate__zoomIn">
+            <div class="card-body">
+                <h5>Fast, Powerful, and Easy – Drive Innovation, Increase Efficiency, and Build Your Program with Unlimited Scalability</h5>
+            </div>
+        </div>
+
+        <!-- Greeting Message -->
+        <div class="text-center mt-4">
+            <h2 id="greetingMessage" class="fw-bold animate__animated animate__fadeInUp"></h2>
+        </div>
+
+        <!-- Login/Register/Reset Buttons -->
+        <div class="text-center mt-3 animate__animated animate__fadeIn">
+            <a href="https://t.me/YourBotUsername?start=login" target="_blank" class="btn btn-outline-primary me-2">Login</a>
+            <a href="https://t.me/YourBotUsername?start=register" target="_blank" class="btn btn-outline-success me-2">Registrasi</a>
+            <a href="https://t.me/YourBotUsername?start=reset_password" target="_blank" class="btn btn-outline-danger">Reset Password</a>
+        </div>
+
+        <!-- Search Bar -->
+        <div class="search-bar text-center my-4 animate__animated animate__fadeInUp">
+            <input type="text" id="searchInput" class="form-control w-50 mx-auto" placeholder="Search for features..." oninput="filterTables()">
+        </div>
+        <div id="noResultsMessage" class="text-center mt-3 text-danger" style="display: none;">
+            <p class="fw-bold">Fitur Tidak ditemukan!</p>
+        </div>
+
+        <!-- Game Table -->
+        <h2 class="mt-5 animate__animated animate__fadeInLeft" id="gameTitle">Stalk Game</h2>
+        <div class="table-responsive mb-5" id="gameTableContainer">
+            <table class="table table-striped table-hover">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Nama Fitur</th>
+                        <th>Metode</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+                <tbody id="gameTable">
+                    <!-- Data akan dimasukkan melalui JavaScript -->
+                </tbody>
+            </table>
+        </div>
+
+        <!-- AI Table -->
+        <h2 class="mt-5 animate__animated animate__fadeInLeft" id="aiTitle">Ai</h2>
+        <div class="table-responsive mb-5" id="aiTableContainer">
+            <table class="table table-striped table-hover">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Nama Fitur</th>
+                        <th>Metode</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+                <tbody id="aiTable">
+                    <!-- Data akan dimasukkan melalui JavaScript -->
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Total Features -->
+        <div class="text-center mt-3 animate__animated animate__fadeIn">
+            <p class="fw-bold">Total Features: <span id="totalFeatures">0</span></p>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-light py-3 animate__animated animate__fadeInUp">
+        <div class="container text-center">
+            <p class="mb-0">&copy; 2024 Aquilaresbot API. All Rights Reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0/js/all.min.js"></script>
+    <script>
+        const body = document.body;
+        const toggleModeButton = document.getElementById('toggleMode');
+        const toggleIcon = document.getElementById('toggleIcon');
+
+        // Toggle mode logic
+        toggleModeButton.addEventListener('click', () => {
+            if (body.classList.contains('bg-light')) {
+                body.classList.replace('bg-light', 'bg-dark');
+                body.classList.replace('text-dark', 'text-light');
+                toggleIcon.innerHTML = '<i class="fas fa-moon"></i> Mode';
+            } else {
+                body.classList.replace('bg-dark', 'bg-light');
+                body.classList.replace('text-light', 'text-dark');
+                toggleIcon.innerHTML = '<i class="fas fa-sun"></i> Mode';
+            }
+        });
+
+        // Set greeting message based on time
+        const greetingMessage = document.getElementById('greetingMessage');
+        const hour = new Date().getHours();
+        if (hour < 12) {
+            greetingMessage.textContent = "Halo, Selamat Pagi!";
+        } else if (hour < 18) {
+            greetingMessage.textContent = "Halo, Selamat Siang!";
+        } else if (hour < 21) {
+            greetingMessage.textContent = "Halo, Selamat Sore!";
+        } else {
+            greetingMessage.textContent = "Halo, Selamat Malam!";
+        }
+
+        // API Data
+        const apiData = [
+            { category: "Game", name: "Free Fire", method: "GET", link: "/api/freefire?userid=&apikey=" },
+            { category: "Game", name: "Mobile Legends", method: "GET", link: "/api/mobilegends?userid=&zoneid=&apikey=" },
+            { category: "Game", name: "Genshin Impact", method: "GET", link: "/api/genshin?userid=&zoneid=&apikey=" },
+            { category: "Game", name: "Sausage man", method: "GET", link: "/api/sausage?userid=&apikey=" },
+            { category: "AI", name: "ChatGPT", method: "GET", link: "#" },
+            { category: "AI", name: "Simi", method: "GET", link: "#" }
+        ];
+
+        const gameTable = document.getElementById('gameTable');
+        const aiTable = document.getElementById('aiTable');
+        const totalFeaturesElement = document.getElementById('totalFeatures');
+        const gameTableContainer = document.getElementById('gameTableContainer');
+        const aiTableContainer = document.getElementById('aiTableContainer');
+        const gameTitle = document.getElementById('gameTitle');
+        const aiTitle = document.getElementById('aiTitle');
+
+        // Populate the tables and update the total counts
+        function populateTables() {
+            gameTable.innerHTML = ""; // Clear the game table
+            aiTable.innerHTML = ""; // Clear the AI table
+
+            let totalFeatures = 0;
+
+            apiData.forEach(api => {
+                const row = document.createElement('tr');
+                row.className = "animate__animated animate__fadeInUp";
+                row.innerHTML = `
+                    <td>${api.name}</td>
+                    <td><span class="badge bg-primary">${api.method}</span></td>
+                    <td><a href="${api.link}" class="btn btn-outline-primary btn-sm">Try</a></td>
+                `;
+
+                if (api.category === "Game") {
+                    gameTable.appendChild(row);
+                } else if (api.category === "AI") {
+                    aiTable.appendChild(row);
+                }
+                totalFeatures++;
+            });
+
+            // Update total features count
+            totalFeaturesElement.textContent = totalFeatures;
+        }
+
+        populateTables();
+
+        // Filter tables based on search
+        function filterTables() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            const rowsGame = document.querySelectorAll('#gameTable tr');
+            const rowsAI = document.querySelectorAll('#aiTable tr');
+            const noResultsMessage = document.getElementById('noResultsMessage');
+
+            let foundGame = false;
+            let foundAI = false;
+
+            rowsGame.forEach(row => {
+                const cells = row.querySelectorAll('td');
+                const match = [...cells].some(cell => cell.textContent.toLowerCase().includes(query));
+                if (match) {
+                    row.style.display = '';
+                    foundGame = true;
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+
+            rowsAI.forEach(row => {
+                const cells = row.querySelectorAll('td');
+                const match = [...cells].some(cell => cell.textContent.toLowerCase().includes(query));
+                if (match) {
+                    row.style.display = '';
+                    foundAI = true;
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+
+            if (foundGame) {
+                gameTableContainer.style.display = 'block';
+                gameTitle.style.display = 'block';
+            } else {
+                gameTableContainer.style.display = 'none';
+                gameTitle.style.display = 'none';
+            }
+
+            if (foundAI) {
+                aiTableContainer.style.display = 'block';
+                aiTitle.style.display = 'block';
+            } else {
+                aiTableContainer.style.display = 'none';
+                aiTitle.style.display = 'none';
+            }
+
+            if (!foundGame && !foundAI) {
+                noResultsMessage.style.display = 'block';
+            } else {
+                noResultsMessage.style.display = 'none';
+            }
+        }
+        
+        // Array of music files
+    const musicPlaylist = [
+        'https://g.top4top.io/m_3278qjanh0.mp3',
+        'https://j.top4top.io/m_32785z6us0.mp3',
+        'https://c.top4top.io/m_32780m4ch0.mp3'
+    ];
+
+    let currentTrackIndex = 0;
+
+    // Function to change the music source
+    function changeMusic() {
+        const audioPlayer = document.getElementById('audioPlayer');
+        const audioSource = document.getElementById('audioSource');
+
+        // Set the new track
+        audioSource.src = musicPlaylist[currentTrackIndex];
+
+        // Reload the audio player to play the new track
+        audioPlayer.load();
+        audioPlayer.play();
+
+        // Update the track index for next time
+        currentTrackIndex = (currentTrackIndex + 1) % musicPlaylist.length;
+    }
+
+    // Set up event listener for when the music ends
+    document.getElementById('audioPlayer').addEventListener('ended', changeMusic);
+
+    // Play the first track initially
+    changeMusic();
+    </script>
+</body>
+</html>
